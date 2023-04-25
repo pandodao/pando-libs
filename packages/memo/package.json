@@ -1,5 +1,5 @@
 {
-  "name": "@pando/memo-encode",
+  "name": "@foxone/memo-encode",
   "version": "0.1.0",
   "description": "Pando memo proto",
   "main": "index.ts",
