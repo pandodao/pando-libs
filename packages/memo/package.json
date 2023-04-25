@@ -1,0 +1,18 @@
+{
+  "name": "@pando/memo-encode",
+  "version": "0.0.0",
+  "description": "Pando memo proto",
+  "main": "index.ts",
+  "license": "MIT",
+  "scripts": {
+    "test": "vitest run --config ./vitest.config.ts"
+  },
+  "devDependencies": {
+    "@types/uuid": "^9.0.1",
+    "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "@foxone/utils": "^0.2.27",
+    "uuid": "^9.0.0"
+  }
+}
