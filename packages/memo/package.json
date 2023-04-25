@@ -1,6 +1,6 @@
 {
   "name": "@foxone/memo-encode",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Pando memo proto",
   "main": "index.ts",
   "license": "MIT",
