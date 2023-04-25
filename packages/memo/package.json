@@ -1,6 +1,6 @@
 {
   "name": "@pando/memo-encode",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Pando memo proto",
   "main": "index.ts",
   "license": "MIT",
