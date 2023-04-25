@@ -1,1 +1,1 @@
-export * from "./swap";
+export * as swap from "./swap";
