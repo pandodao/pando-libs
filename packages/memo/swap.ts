@@ -28,9 +28,8 @@ import {
 } from "./constants";
 
 export interface MMISGParams {
-  member_count: number;
   threshold?: number;
-  members?: string[];
+  members: string[];
 }
 
 export interface SwapParams {
@@ -44,14 +43,14 @@ export function encodeSwapMemo(params: SwapParams & MMISGParams) {
   const header = encodeHeader({
     version: HeaderVersion,
     protocol_id: SwapProtocolId,
-    has_follow_id: 1,
+    has_follow_id: params.follow_id ? 1 : 0,
     follow_id: params.follow_id,
     action: SwapActionIds.Swap,
   });
 
   const mmisg = encodeMMISG({
     version: MMISGVersion,
-    member_count: params.member_count,
+    member_count: params.members.length,
     threshold: params.threshold,
     members: params.members,
   });
@@ -59,9 +58,9 @@ export function encodeSwapMemo(params: SwapParams & MMISGParams) {
   const array: Uint8Array[] = [];
 
   array.push(uuidToUint8Array(params.fill_asset_id));
-  array.push(uint64ToUint8Array(formatToInt64(params.minimum)));
   array.push(uint8ToUint8Array(params.route_hash.length));
   array.push(stringToUint8Array(params.route_hash));
+  array.push(uint64ToUint8Array(formatToInt64(params.minimum)));
 
   return uint8ArrayToBase64(mergeUint8Array(header, mmisg, ...array));
 }
@@ -82,16 +81,17 @@ export function decodeSwapMemo(str: string) {
   params.fill_asset_id = uint8ArrayToUUID(arr.slice(offset, offset + 16));
   offset += 16;
 
-  params.minimum = bigIntToNumber(
-    uint8ArrayToUint64(arr.slice(offset, offset + 8))
-  );
-  offset += 8;
-
   const routeHashLength = uint8ArrayToUint8(arr.slice(offset, offset + 1));
   offset += 1;
   params.route_hash = uint8ArrayToString(
     arr.slice(offset, offset + routeHashLength)
   );
+  offset = offset + routeHashLength;
+
+  params.minimum = bigIntToNumber(
+    uint8ArrayToUint64(arr.slice(offset, offset + 8))
+  );
+  offset += 8;
 
   return {
     header,
@@ -113,14 +113,14 @@ export function encodeAddLiquidityMemo(
   const header = encodeHeader({
     version: HeaderVersion,
     protocol_id: SwapProtocolId,
-    has_follow_id: 1,
+    has_follow_id: params.follow_id ? 1 : 0,
     follow_id: params.follow_id,
     action: SwapActionIds.AddLiquidity,
   });
 
   const mmisg = encodeMMISG({
     version: MMISGVersion,
-    member_count: params.member_count,
+    member_count: params.members.length,
     threshold: params.threshold,
     members: params.members,
   });
@@ -151,7 +151,7 @@ export function decodeAddLiquidityMemo(str: string) {
   offset += 16;
 
   params.slippage = bigIntToNumber(
-    uint8ArrayToUint64(arr.slice(offset, offset + 2))
+    uint8ArrayToUint64(arr.slice(offset, offset + 8))
   );
   offset += 8;
 
@@ -174,14 +174,14 @@ export function encodeRemoveLiquidityMemo(
   const header = encodeHeader({
     version: HeaderVersion,
     protocol_id: SwapProtocolId,
-    has_follow_id: 1,
+    has_follow_id: params.follow_id ? 1 : 0,
     follow_id: params.follow_id,
     action: SwapActionIds.RemoveLiquidity,
   });
 
   const mmisg = encodeMMISG({
     version: MMISGVersion,
-    member_count: params.member_count,
+    member_count: params.members.length,
     threshold: params.threshold,
     members: params.members,
   });

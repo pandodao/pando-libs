@@ -1,4 +1,3 @@
-import Base64 from "@foxone/utils/base64";
 import { parse as uuidParse, stringify as uuidStringify } from "uuid";
 
 export function mergeUint8Array(...arrays: Uint8Array[]) {
@@ -17,11 +16,11 @@ export function mergeUint8Array(...arrays: Uint8Array[]) {
 }
 
 export function uint8ArrayToBase64(uint8Array: Uint8Array) {
-  return Base64.encode(uint8ArrayToString(uint8Array));
+  return Buffer.from(uint8Array).toString("base64");
 }
 
 export function base64ToUint8Array(str: string) {
-  return stringToUint8Array(Base64.decode(str));
+  return new Uint8Array(Buffer.from(str, "base64"));
 }
 
 // number 0 - 256
