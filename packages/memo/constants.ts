@@ -6,7 +6,7 @@ export const LeafProtocolId = 2;
 export const RingsProtocolId = 3;
 
 export const SwapActionIds = {
-  Swap: 1,
-  AddLiquidity: 2,
-  RemoveLiquidity: 3,
+  AddLiquidity: 1,
+  RemoveLiquidity: 2,
+  Swap: 3,
 };
