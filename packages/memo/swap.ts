@@ -19,12 +19,7 @@ import {
   uint8ToUint8Array,
   uuidToUint8Array,
 } from "./encode";
-import {
-  formatToInt64,
-  formatToInt,
-  bigIntToNumber,
-  intToNumber,
-} from "./helper";
+import { formatToInt64, bigIntToNumber } from "./helper";
 import {
   HeaderVersion,
   MMISGVersion,
@@ -33,9 +28,8 @@ import {
 } from "./constants";
 
 export interface MMISGParams {
-  member_count: number;
   threshold?: number;
-  members?: string[];
+  members: string[];
 }
 
 export interface SwapParams {
@@ -49,14 +43,14 @@ export function encodeSwapMemo(params: SwapParams & MMISGParams) {
   const header = encodeHeader({
     version: HeaderVersion,
     protocol_id: SwapProtocolId,
-    has_follow_id: 1,
+    has_follow_id: params.follow_id ? 1 : 0,
     follow_id: params.follow_id,
     action: SwapActionIds.Swap,
   });
 
   const mmisg = encodeMMISG({
     version: MMISGVersion,
-    member_count: params.member_count,
+    member_count: params.members.length,
     threshold: params.threshold,
     members: params.members,
   });
@@ -64,9 +58,9 @@ export function encodeSwapMemo(params: SwapParams & MMISGParams) {
   const array: Uint8Array[] = [];
 
   array.push(uuidToUint8Array(params.fill_asset_id));
-  array.push(uint64ToUint8Array(formatToInt64(params.minimum)));
   array.push(uint8ToUint8Array(params.route_hash.length));
   array.push(stringToUint8Array(params.route_hash));
+  array.push(uint64ToUint8Array(formatToInt64(params.minimum)));
 
   return uint8ArrayToBase64(mergeUint8Array(header, mmisg, ...array));
 }
@@ -87,16 +81,17 @@ export function decodeSwapMemo(str: string) {
   params.fill_asset_id = uint8ArrayToUUID(arr.slice(offset, offset + 16));
   offset += 16;
 
-  params.minimum = bigIntToNumber(
-    uint8ArrayToUint64(arr.slice(offset, offset + 8))
-  );
-  offset += 8;
-
   const routeHashLength = uint8ArrayToUint8(arr.slice(offset, offset + 1));
   offset += 1;
   params.route_hash = uint8ArrayToString(
     arr.slice(offset, offset + routeHashLength)
   );
+  offset = offset + routeHashLength;
+
+  params.minimum = bigIntToNumber(
+    uint8ArrayToUint64(arr.slice(offset, offset + 8))
+  );
+  offset += 8;
 
   return {
     header,
@@ -118,14 +113,14 @@ export function encodeAddLiquidityMemo(
   const header = encodeHeader({
     version: HeaderVersion,
     protocol_id: SwapProtocolId,
-    has_follow_id: 1,
+    has_follow_id: params.follow_id ? 1 : 0,
     follow_id: params.follow_id,
     action: SwapActionIds.AddLiquidity,
   });
 
   const mmisg = encodeMMISG({
     version: MMISGVersion,
-    member_count: params.member_count,
+    member_count: params.members.length,
     threshold: params.threshold,
     members: params.members,
   });
@@ -133,8 +128,8 @@ export function encodeAddLiquidityMemo(
   const array: Uint8Array[] = [];
 
   array.push(uuidToUint8Array(params.asset_id));
-  array.push(uint16ToUint8Array(formatToInt(params.slippage, 4)));
-  array.push(uint8ToUint8Array(params.timeout));
+  array.push(uint64ToUint8Array(formatToInt64(params.slippage)));
+  array.push(uint16ToUint8Array(params.timeout));
 
   return uint8ArrayToBase64(mergeUint8Array(header, mmisg, ...array));
 }
@@ -155,13 +150,12 @@ export function decodeAddLiquidityMemo(str: string) {
   params.asset_id = uint8ArrayToUUID(arr.slice(offset, offset + 16));
   offset += 16;
 
-  params.slippage = intToNumber(
-    uint8ArrayToUint16(arr.slice(offset, offset + 2)),
-    4
+  params.slippage = bigIntToNumber(
+    uint8ArrayToUint64(arr.slice(offset, offset + 8))
   );
-  offset += 2;
+  offset += 8;
 
-  params.timeout = uint8ArrayToUint8(arr.slice(offset, offset + 1));
+  params.timeout = uint8ArrayToUint16(arr.slice(offset, offset + 2));
 
   return {
     header,
@@ -180,14 +174,14 @@ export function encodeRemoveLiquidityMemo(
   const header = encodeHeader({
     version: HeaderVersion,
     protocol_id: SwapProtocolId,
-    has_follow_id: 1,
+    has_follow_id: params.follow_id ? 1 : 0,
     follow_id: params.follow_id,
     action: SwapActionIds.RemoveLiquidity,
   });
 
   const mmisg = encodeMMISG({
     version: MMISGVersion,
-    member_count: params.member_count,
+    member_count: params.members.length,
     threshold: params.threshold,
     members: params.members,
   });
