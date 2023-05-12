@@ -1,5 +1,11 @@
 # @pando/memo-encode
 
+## 0.1.3
+
+### Patch Changes
+
+- 8524e0f: update build
+
 ## 0.1.2
 
 ### Patch Changes
