@@ -1,4 +1,5 @@
 import { parse as uuidParse, stringify as uuidStringify } from "uuid";
+import { Buffer } from "buffer";
 
 export function mergeUint8Array(...arrays: Uint8Array[]) {
   const totalLength = arrays.reduce((acc, array) => acc + array.byteLength, 0);
