@@ -26,11 +26,7 @@ import {
   SwapProtocolId,
   SwapActionIds,
 } from "./constants";
-
-export interface MMISGParams {
-  threshold?: number;
-  members: string[];
-}
+import { MMISGParams } from "./types";
 
 export interface SwapParams {
   follow_id: string; // uuid
