@@ -1,6 +1,5 @@
 import {
   encodeHeader,
-  encodeMMISG,
   uuidToUint8Array,
   uint64ToUint8Array,
   uint8ArrayToBase64,
@@ -8,8 +7,6 @@ import {
   base64ToUint8Array,
   decodeHeader,
   getHeaderByteLength,
-  decodeMMISG,
-  getMMISGByteLength,
   uint8ArrayToUUID,
   uint8ArrayToUint64,
 } from "./encode";
@@ -18,21 +15,16 @@ import {
   HeaderVersion,
   LimitOrderProtocolId,
   LimitOrderActionIds,
-  MMISGVersion,
 } from "./constants";
-import { MMISGParams } from "./types";
 
 export interface PutLimitOrderParams {
   follow_id: string;
-  members: string[];
   fill_asset_id: string;
   expect_amount: number;
   expire: number;
 }
 
-export function encodePutLimitOrderMemo(
-  params: PutLimitOrderParams & MMISGParams
-) {
+export function encodePutLimitOrderMemo(params: PutLimitOrderParams) {
   const header = encodeHeader({
     version: HeaderVersion,
     protocol_id: LimitOrderProtocolId,
@@ -41,20 +33,13 @@ export function encodePutLimitOrderMemo(
     action: LimitOrderActionIds.PutOrder,
   });
 
-  const mmisg = encodeMMISG({
-    version: MMISGVersion,
-    member_count: params.members.length,
-    threshold: params.threshold,
-    members: params.members,
-  });
-
   const array: Uint8Array[] = [];
 
   array.push(uuidToUint8Array(params.fill_asset_id));
   array.push(uint64ToUint8Array(formatToInt64(params.expect_amount)));
   array.push(uint64ToUint8Array(BigInt(params.expire)));
 
-  return uint8ArrayToBase64(mergeUint8Array(header, mmisg, ...array));
+  return uint8ArrayToBase64(mergeUint8Array(header, ...array));
 }
 
 export function decodePutLimitOrderMemo(str: string) {
@@ -63,12 +48,9 @@ export function decodePutLimitOrderMemo(str: string) {
   const header = decodeHeader(arr);
   const headerByteLength = getHeaderByteLength(header);
 
-  const mmisg = decodeMMISG(arr.slice(headerByteLength));
-  const mmisgByteLength = getMMISGByteLength(mmisg);
-
   const params: Partial<PutLimitOrderParams> = {};
 
-  let offset = headerByteLength + mmisgByteLength;
+  let offset = headerByteLength;
 
   params.fill_asset_id = uint8ArrayToUUID(arr.slice(offset, offset + 16));
   offset += 16;
@@ -80,35 +62,28 @@ export function decodePutLimitOrderMemo(str: string) {
 
   params.expire = Number(uint8ArrayToUint64(arr.slice(offset, offset + 8)));
 
-  return { header, mmisg, params };
+  return { header, params };
 }
 
 export interface CancelLimitOrderParams {
   order_id: string;
+  follow_id: string;
 }
 
-export function encodeCancelLimitOrderMemo(
-  params: CancelLimitOrderParams & MMISGParams
-) {
+export function encodeCancelLimitOrderMemo(params: CancelLimitOrderParams) {
   const header = encodeHeader({
     version: HeaderVersion,
     protocol_id: LimitOrderProtocolId,
-    has_follow_id: 0,
+    has_follow_id: params.follow_id ? 1 : 0,
+    follow_id: params.follow_id,
     action: LimitOrderActionIds.CancelOrder,
-  });
-
-  const mmisg = encodeMMISG({
-    version: MMISGVersion,
-    member_count: params.members.length,
-    threshold: params.threshold,
-    members: params.members,
   });
 
   const array: Uint8Array[] = [];
 
   array.push(uuidToUint8Array(params.order_id));
 
-  return uint8ArrayToBase64(mergeUint8Array(header, mmisg, ...array));
+  return uint8ArrayToBase64(mergeUint8Array(header, ...array));
 }
 
 export function decodeCancelLimitOrderMemo(str: string) {
@@ -117,14 +92,11 @@ export function decodeCancelLimitOrderMemo(str: string) {
   const header = decodeHeader(arr);
   const headerByteLength = getHeaderByteLength(header);
 
-  const mmisg = decodeMMISG(arr.slice(headerByteLength));
-  const mmisgByteLength = getMMISGByteLength(mmisg);
-
   const params: Partial<CancelLimitOrderParams> = {};
 
-  const offset = headerByteLength + mmisgByteLength;
+  const offset = headerByteLength;
 
   params.order_id = uint8ArrayToUUID(arr.slice(offset, offset + 16));
 
-  return { header, mmisg, params };
+  return { header, params };
 }

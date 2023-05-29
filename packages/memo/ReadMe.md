@@ -7,16 +7,19 @@ This typescript repo provide implementation of [Pando Memo Encoding Proto](https
 Here is an example for converting swap params to base64 formated memo:
 
 ```ts
-import { encodeSwapMemo } from "@foxone/memo-encode/swap";
+import { swap as MemoEncoder } from "@foxone/memo-encode";
 
+// swap encode
 const params = {
   follow_id: uuid(),
   fill_asset_id: uuid(),
   minimum: 1.00001,
   route_hash: "xyz",
-  member_count: 0,
+  members: [],
 };
 
 // base64 memo for mixin transaction
-const memo = encodeSwapMemo(params);
+const memo = MemoEncoder.encodeSwapMemo(params);
 ```
+
+Other functions and params please read source code from `src/index.ts`
