@@ -1,5 +1,11 @@
 # @pando/memo-encode
 
+## 0.1.4
+
+### Patch Changes
+
+- 1bb4285: add limit order memo
+
 ## 0.1.3
 
 ### Patch Changes
