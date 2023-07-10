@@ -34,12 +34,22 @@ export function uint8ToUint8Array(n: number) {
   return new Uint8Array(buffer);
 }
 
-// number 0 - 65535
+// number 0 - 65535 uint16
 export function uint16ToUint8Array(n: number) {
   const buffer = new ArrayBuffer(2);
   const view = new DataView(buffer);
 
   view.setUint16(0, n);
+
+  return new Uint8Array(buffer);
+}
+
+// uint32
+export function uint32ToUint8Array(n: number) {
+  const buffer = new ArrayBuffer(4);
+  const view = new DataView(buffer);
+
+  view.setUint32(0, n);
 
   return new Uint8Array(buffer);
 }
@@ -65,20 +75,27 @@ export function uuidToUint8Array(string: string) {
   return uint8Array;
 }
 
-// number: 0 - 256
+// number: 0 - 256 uint8
 export function uint8ArrayToUint8(arr: Uint8Array) {
   const view = new DataView(arr.buffer);
 
   return view.getUint8(0);
 }
 
-// number: 0 - 65535
+// number: 0 - 65535 uint16
 export function uint8ArrayToUint16(arr: Uint8Array) {
   const view = new DataView(arr.buffer);
 
   return view.getUint16(0);
 }
 
+export function uint8ArrayToUint32(arr: Uint8Array) {
+  const view = new DataView(arr.buffer);
+
+  return view.getUint32(0);
+}
+
+// uint64
 export function uint8ArrayToUint64(arr: Uint8Array) {
   const view = new DataView(arr.buffer);
 
