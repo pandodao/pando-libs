@@ -1,5 +1,11 @@
 # @pando/memo-encode
 
+## 0.2.0
+
+### Minor Changes
+
+- 4ed2ebe: version 2
+
 ## 0.1.5
 
 ### Patch Changes
