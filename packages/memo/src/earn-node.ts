@@ -16,6 +16,7 @@ import {
   uint8ArrayToUint8,
   getHeaderByteLength,
   uint8ArrayToString,
+  checkSum,
 } from "./encode";
 
 export interface BuyParams {
@@ -38,7 +39,7 @@ export function encodeBuyMemo(params: BuyParams) {
   array.push(uint32ToUint8Array(params.product_id));
   array.push(uint8ToUint8Array(params.product_status));
 
-  return uint8ArrayToBase64(mergeUint8Array(header, ...array));
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, ...array)));
 }
 
 export function decodeBuyMemo(str: string) {
@@ -85,7 +86,7 @@ export function encodeRedeemMemo(params: RedeemParams) {
   array.push(stringToUint8Array(params.amount));
   array.push(uint8ToUint8Array(params.product_status));
 
-  return uint8ArrayToBase64(mergeUint8Array(header, ...array));
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, ...array)));
 }
 
 export function decodeRedeemMemo(str: string) {
@@ -134,5 +135,5 @@ export function encodeCancelQueueMemo(params: CancelQueueParams) {
   array.push(uint8ToUint8Array(params.event_id.length));
   array.push(stringToUint8Array(params.event_id));
 
-  return uint8ArrayToBase64(mergeUint8Array(header, ...array));
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, ...array)));
 }

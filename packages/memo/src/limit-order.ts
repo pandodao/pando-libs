@@ -9,6 +9,9 @@ import {
   getHeaderByteLength,
   uint8ArrayToUUID,
   uint8ArrayToUint64,
+  checkSum,
+  uint8ToUint8Array,
+  stringToUint8Array,
 } from "./encode";
 import { formatToInt64, bigIntToNumber } from "./helper";
 import {
@@ -35,11 +38,14 @@ export function encodePutLimitOrderMemo(params: PutLimitOrderParams) {
 
   const array: Uint8Array[] = [];
 
+  // order type = 1
+  array.push(uint8ToUint8Array(1));
+
   array.push(uuidToUint8Array(params.fill_asset_id));
   array.push(uint64ToUint8Array(formatToInt64(params.expect_amount)));
   array.push(uint64ToUint8Array(BigInt(params.expire)));
 
-  return uint8ArrayToBase64(mergeUint8Array(header, ...array));
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, ...array)));
 }
 
 export function decodePutLimitOrderMemo(str: string) {
@@ -83,7 +89,7 @@ export function encodeCancelLimitOrderMemo(params: CancelLimitOrderParams) {
 
   array.push(uuidToUint8Array(params.order_id));
 
-  return uint8ArrayToBase64(mergeUint8Array(header, ...array));
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, ...array)));
 }
 
 export function decodeCancelLimitOrderMemo(str: string) {
@@ -99,4 +105,51 @@ export function decodeCancelLimitOrderMemo(str: string) {
   params.order_id = uint8ArrayToUUID(arr.slice(offset, offset + 16));
 
   return { header, params };
+}
+
+export interface Route {
+  exchange: number;
+  shares: number;
+  routes: string;
+}
+
+export interface PutAggSwapOrderParams {
+  follow_id: string;
+  fill_asset_id: string;
+  min_amount: number;
+  routes: Route[];
+}
+
+export function encodePutAggSwapOrderMemo(params: PutAggSwapOrderParams) {
+  const header = encodeHeader({
+    version: HeaderVersion,
+    protocol_id: LimitOrderProtocolId,
+    has_follow_id: params.follow_id ? 1 : 0,
+    follow_id: params.follow_id,
+    action: LimitOrderActionIds.PutOrder,
+  });
+
+  const array: Uint8Array[] = [];
+
+  // order type = 2
+  array.push(uint8ToUint8Array(2));
+  array.push(uuidToUint8Array(params.fill_asset_id));
+  array.push(uint64ToUint8Array(formatToInt64(params.min_amount)));
+
+  const routes = mergeUint8Array(...params.routes.map(encodeRoute));
+
+  array.push(uint8ToUint8Array(routes.length));
+  array.push(routes);
+
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, ...array)));
+}
+
+function encodeRoute(route: Route) {
+  const array: Uint8Array[] = [];
+
+  array.push(uint8ToUint8Array(route.exchange));
+  array.push(uint8ToUint8Array(route.routes.length));
+  array.push(stringToUint8Array(route.routes));
+
+  return mergeUint8Array(...array);
 }

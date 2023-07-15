@@ -17,6 +17,7 @@ import {
   decodeMMISG,
   stringToUint8Array,
   uint8ArrayToString,
+  checkSum,
 } from "./encode";
 
 describe("Test Encode", () => {
@@ -140,5 +141,11 @@ describe("Test Encode", () => {
 
     expect(uint8Array.byteLength).eq(3 + 16 * 3);
     expect(decodeMMISG(uint8Array)).toEqual(mmisg);
+  });
+
+  it("test checkSum", () => {
+    const arr = new Uint8Array([1, 2, 3, 4, 5, 6]);
+
+    expect(checkSum(arr).length).eq(10);
   });
 });
