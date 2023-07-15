@@ -1,4 +1,4 @@
-export const HeaderVersion = 1;
+export const HeaderVersion = 2;
 export const MMISGVersion = 1;
 
 export const SwapProtocolId = 1;

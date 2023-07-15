@@ -2559,6 +2559,11 @@ set-blocking@^2.0.0:
   resolved "https://registry.npmjs.org/set-blocking/-/set-blocking-2.0.0.tgz#045f9782d011ae9a6803ddd382b24392b3d890f7"
   integrity sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==
 
+sha256-uint8array@^0.10.5:
+  version "0.10.5"
+  resolved "https://registry.npmjs.org/sha256-uint8array/-/sha256-uint8array-0.10.5.tgz#a8ca295fda3bd444cb32c0fe784819bd614fe6e2"
+  integrity sha512-KjYP8M6y8VvV62lnSSZwzutuwqphVOOVQamP+GmmClZcYhbq1HSIw/M2tlKgHndiaIwe3tFG5X38YYsQfUdItw==
+
 shebang-command@^1.2.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/shebang-command/-/shebang-command-1.2.0.tgz#44aac65b695b03398968c39f363fee5deafdf1ea"

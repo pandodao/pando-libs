@@ -18,6 +18,7 @@ import {
   uint8ArrayToUint8,
   uint8ToUint8Array,
   uuidToUint8Array,
+  checkSum,
 } from "./encode";
 import { formatToInt64, bigIntToNumber } from "./helper";
 import {
@@ -58,7 +59,7 @@ export function encodeSwapMemo(params: SwapParams & MMISGParams) {
   array.push(stringToUint8Array(params.route_hash));
   array.push(uint64ToUint8Array(formatToInt64(params.minimum)));
 
-  return uint8ArrayToBase64(mergeUint8Array(header, mmisg, ...array));
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, mmisg, ...array)));
 }
 
 export function decodeSwapMemo(str: string) {
@@ -127,7 +128,7 @@ export function encodeAddLiquidityMemo(
   array.push(uint64ToUint8Array(formatToInt64(params.slippage)));
   array.push(uint16ToUint8Array(params.timeout));
 
-  return uint8ArrayToBase64(mergeUint8Array(header, mmisg, ...array));
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, mmisg, ...array)));
 }
 
 export function decodeAddLiquidityMemo(str: string) {
@@ -182,7 +183,7 @@ export function encodeRemoveLiquidityMemo(
     members: params.members,
   });
 
-  return uint8ArrayToBase64(mergeUint8Array(header, mmisg));
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, mmisg)));
 }
 
 export function decodeRemoveLiquidityMemo(str: string) {

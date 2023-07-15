@@ -1,5 +1,6 @@
 import { parse as uuidParse, stringify as uuidStringify } from "uuid";
 import { Buffer } from "buffer";
+import { createHash } from "sha256-uint8array";
 
 export function mergeUint8Array(...arrays: Uint8Array[]) {
   const totalLength = arrays.reduce((acc, array) => acc + array.byteLength, 0);
@@ -218,4 +219,11 @@ export function getMMISGByteLength(mmisg: MMISG) {
     : mmisg.member_count === 1
     ? 18
     : 3 + mmisg.member_count * 16;
+}
+
+export function checkSum(arr: Uint8Array) {
+  const hash1 = createHash().update(arr).digest();
+  const hash2 = createHash().update(hash1).digest();
+
+  return mergeUint8Array(arr, hash2.slice(0, 4));
 }
