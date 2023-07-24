@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@foxone/utils": "^0.2.27",
+    "bignumber.js": "^9.1.1",
     "buffer": "^6.0.3",
     "sha256-uint8array": "^0.10.5",
     "uuid": "^9.0.0"
