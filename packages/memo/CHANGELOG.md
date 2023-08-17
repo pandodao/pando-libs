@@ -1,5 +1,11 @@
 # @pando/memo-encode
 
+## 0.2.1
+
+### Patch Changes
+
+- 035997f: update earn encode
+
 ## 0.2.0
 
 ### Minor Changes
