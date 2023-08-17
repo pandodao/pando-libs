@@ -15,9 +15,11 @@ import {
   uint8ArrayToUint32,
   uint8ArrayToUint8,
   getHeaderByteLength,
-  uint8ArrayToString,
   checkSum,
+  uint64ToUint8Array,
+  uint8ArrayToUint64,
 } from "./encode";
+import { formatToInt64, bigIntToNumber } from "./helper";
 
 export interface BuyParams {
   follow_id: string; // uuid
@@ -66,7 +68,7 @@ export function decodeBuyMemo(str: string) {
 export interface RedeemParams {
   follow_id: string; // uuid
   product_id: number;
-  amount: string;
+  amount: string | number;
   product_status: number;
 }
 
@@ -82,8 +84,7 @@ export function encodeRedeemMemo(params: RedeemParams) {
   const array: Uint8Array[] = [];
 
   array.push(uint32ToUint8Array(params.product_id));
-  array.push(uint8ToUint8Array(params.amount.length));
-  array.push(stringToUint8Array(params.amount));
+  array.push(uint64ToUint8Array(formatToInt64(params.amount)));
   array.push(uint8ToUint8Array(params.product_status));
 
   return uint8ArrayToBase64(checkSum(mergeUint8Array(header, ...array)));
@@ -102,11 +103,9 @@ export function decodeRedeemMemo(str: string) {
   params.product_id = uint8ArrayToUint32(arr.slice(offset, offset + 4));
   offset += 4;
 
-  const amountLength = uint8ArrayToUint8(arr.slice(offset, offset + 1));
-  offset += 1;
-
-  params.amount = uint8ArrayToString(arr.slice(offset, offset + amountLength));
-  offset += amountLength;
+  params.amount =
+    bigIntToNumber(uint8ArrayToUint64(arr.slice(offset, offset + 8))) + "";
+  offset += 8;
 
   params.product_status = uint8ArrayToUint8(arr.slice(offset, offset + 1));
 
