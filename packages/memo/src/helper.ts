@@ -1,15 +1,20 @@
-export function formatToInt64(n: number): bigint {
-  return BigInt((n * 10 ** 8).toFixed(0));
+import BigNumber from "bignumber.js";
+
+export function formatToInt64(n: number | string): bigint {
+  return BigInt(BigNumber(n).times(BigNumber(10).pow(8)).toString());
 }
 
 export function bigIntToNumber(n: bigint): number {
-  return Number(n) / 10 ** 8;
+  return BigNumber(Number(n)).div(BigNumber(10).pow(8)).toNumber();
 }
 
 export function formatToInt(n: number, percision: number) {
-  return Number((n * 10 ** percision).toFixed(0));
+  return BigNumber(n)
+    .times(BigNumber(10).pow(percision))
+    .decimalPlaces(0)
+    .toString();
 }
 
 export function intToNumber(n: number, percision: number): number {
-  return n / 10 ** percision;
+  return BigNumber(n).div(BigNumber(10).pow(percision)).toNumber();
 }

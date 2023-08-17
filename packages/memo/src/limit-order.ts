@@ -23,8 +23,9 @@ import {
 export interface PutLimitOrderParams {
   follow_id: string;
   fill_asset_id: string;
-  expect_amount: number;
-  expire: number;
+  expect_amount: number | string;
+  expire: number | string;
+  order_type?: number;
 }
 
 export function encodePutLimitOrderMemo(params: PutLimitOrderParams) {
@@ -42,7 +43,9 @@ export function encodePutLimitOrderMemo(params: PutLimitOrderParams) {
   array.push(uint8ToUint8Array(1));
 
   array.push(uuidToUint8Array(params.fill_asset_id));
+
   array.push(uint64ToUint8Array(formatToInt64(params.expect_amount)));
+
   array.push(uint64ToUint8Array(BigInt(params.expire)));
 
   return uint8ArrayToBase64(checkSum(mergeUint8Array(header, ...array)));
@@ -57,6 +60,9 @@ export function decodePutLimitOrderMemo(str: string) {
   const params: Partial<PutLimitOrderParams> = {};
 
   let offset = headerByteLength;
+
+  params.order_type = arr[offset];
+  offset += 1;
 
   params.fill_asset_id = uint8ArrayToUUID(arr.slice(offset, offset + 16));
   offset += 16;
@@ -147,7 +153,9 @@ export function encodePutAggSwapOrderMemo(params: PutAggSwapOrderParams) {
 function encodeRoute(route: Route) {
   const array: Uint8Array[] = [];
 
-  array.push(uint8ToUint8Array(route.exchange));
+  const temp = ((route.exchange & 0xf) << 4) | (route.shares & 0xf);
+
+  array.push(uint8ToUint8Array(temp));
   array.push(uint8ToUint8Array(route.routes.length));
   array.push(stringToUint8Array(route.routes));
 
