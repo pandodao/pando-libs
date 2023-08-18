@@ -1,5 +1,11 @@
 # @pando/memo-encode
 
+## 0.2.2
+
+### Patch Changes
+
+- d27faac: issue fix
+
 ## 0.2.1
 
 ### Patch Changes
