@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 
 export function formatToInt64(n: number | string): bigint {
-  return BigInt(BigNumber(n).times(BigNumber(10).pow(8)).toString());
+  return BigInt(BigNumber(n).times(BigNumber(10).pow(8)).toFixed(0));
 }
 
 export function bigIntToNumber(n: bigint): number {
