@@ -1,6 +1,6 @@
 {
   "name": "@foxone/memo-encode",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Pando memo proto",
   "main": "dist/index.umd.js",
   "module": "dist/index.mjs",

@@ -1,5 +1,11 @@
 # @pando/memo-encode
 
+## 0.2.3
+
+### Patch Changes
+
+- 2bb4f9e: add lend memo
+
 ## 0.2.2
 
 ### Patch Changes
