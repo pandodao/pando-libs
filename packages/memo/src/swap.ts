@@ -7,11 +7,9 @@ import {
   getHeaderByteLength,
   getMMISGByteLength,
   mergeUint8Array,
-  stringToUint8Array,
   uint16ToUint8Array,
   uint64ToUint8Array,
   uint8ArrayToBase64,
-  uint8ArrayToString,
   uint8ArrayToUUID,
   uint8ArrayToUint16,
   uint8ArrayToUint64,
@@ -33,7 +31,63 @@ export interface SwapParams {
   follow_id: string; // uuid
   fill_asset_id: string; // uuid
   minimum: number; // uint64
-  route_hash: string;
+  routes: RouteItem[];
+}
+
+export interface RouteItem {
+  weight: number; //
+  pairIds: number[];
+}
+
+export function encodeRoutes(routes: RouteItem[]) {
+  const arrays: Uint8Array[] = [];
+
+  arrays.push(uint8ToUint8Array(routes.length));
+
+  routes.forEach((route) => {
+    arrays.push(uint8ToUint8Array(route.weight));
+    arrays.push(uint8ToUint8Array(route.pairIds.length));
+
+    route.pairIds.forEach((id) => {
+      arrays.push(uint16ToUint8Array(id));
+    });
+  });
+  console.log("merged array", mergeUint8Array(...arrays));
+
+  return mergeUint8Array(...arrays);
+}
+
+export function decodeRoutes(array: Uint8Array): {
+  routes: RouteItem[];
+  length: number;
+} {
+  console.log("array", array);
+  let offset = 0;
+
+  const routes: RouteItem[] = [];
+  const routeLength = uint8ArrayToUint8(array.slice(0, 1));
+
+  offset += 1;
+
+  for (let i = 0; i < routeLength; i++) {
+    const pairIds: number[] = [];
+    const weight = uint8ArrayToUint8(array.slice(offset, offset + 1));
+
+    offset += 1;
+
+    const pairIdsLength = uint8ArrayToUint8(array.slice(offset, offset + 1));
+
+    offset += 1;
+
+    for (let j = 0; j < pairIdsLength; j++) {
+      pairIds.push(uint8ArrayToUint16(array.slice(offset, offset + 2)));
+      offset += 2;
+    }
+
+    routes.push({ weight, pairIds });
+  }
+
+  return { routes, length: offset };
 }
 
 export function encodeSwapMemo(params: SwapParams & MMISGParams) {
@@ -55,8 +109,7 @@ export function encodeSwapMemo(params: SwapParams & MMISGParams) {
   const array: Uint8Array[] = [];
 
   array.push(uuidToUint8Array(params.fill_asset_id));
-  array.push(uint8ToUint8Array(params.route_hash.length));
-  array.push(stringToUint8Array(params.route_hash));
+  array.push(encodeRoutes(params.routes));
   array.push(uint64ToUint8Array(formatToInt64(params.minimum)));
 
   return uint8ArrayToBase64(checkSum(mergeUint8Array(header, mmisg, ...array)));
@@ -78,12 +131,10 @@ export function decodeSwapMemo(str: string) {
   params.fill_asset_id = uint8ArrayToUUID(arr.slice(offset, offset + 16));
   offset += 16;
 
-  const routeHashLength = uint8ArrayToUint8(arr.slice(offset, offset + 1));
-  offset += 1;
-  params.route_hash = uint8ArrayToString(
-    arr.slice(offset, offset + routeHashLength)
-  );
-  offset = offset + routeHashLength;
+  const { routes, length: RoutesLength } = decodeRoutes(arr.slice(offset));
+
+  params.routes = routes;
+  offset = offset + RoutesLength;
 
   params.minimum = bigIntToNumber(
     uint8ArrayToUint64(arr.slice(offset, offset + 8))
