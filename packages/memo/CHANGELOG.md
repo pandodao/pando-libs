@@ -1,5 +1,11 @@
 # @pando/memo-encode
 
+## 0.3.0
+
+### Minor Changes
+
+- bdeaaf7: update swap
+
 ## 0.2.3
 
 ### Patch Changes
