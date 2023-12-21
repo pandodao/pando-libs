@@ -1,11 +1,8 @@
 import {
   base64ToUint8Array,
   decodeHeader,
-  decodeMMISG,
   encodeHeader,
-  encodeMMISG,
   getHeaderByteLength,
-  getMMISGByteLength,
   mergeUint8Array,
   uint16ToUint8Array,
   uint64ToUint8Array,
@@ -19,13 +16,7 @@ import {
   checkSum,
 } from "./encode";
 import { formatToInt64, bigIntToNumber } from "./helper";
-import {
-  HeaderVersion,
-  MMISGVersion,
-  SwapProtocolId,
-  SwapActionIds,
-} from "./constants";
-import { MMISGParams } from "./types";
+import { HeaderVersion, SwapProtocolId, SwapActionIds } from "./constants";
 
 export interface SwapParams {
   follow_id: string; // uuid
@@ -90,7 +81,7 @@ export function decodeRoutes(array: Uint8Array): {
   return { routes, length: offset };
 }
 
-export function encodeSwapMemo(params: SwapParams & MMISGParams) {
+export function encodeSwapMemo(params: SwapParams) {
   const header = encodeHeader({
     version: HeaderVersion,
     protocol_id: SwapProtocolId,
@@ -99,20 +90,13 @@ export function encodeSwapMemo(params: SwapParams & MMISGParams) {
     action: SwapActionIds.Swap,
   });
 
-  const mmisg = encodeMMISG({
-    version: MMISGVersion,
-    member_count: params.members.length,
-    threshold: params.threshold,
-    members: params.members,
-  });
-
   const array: Uint8Array[] = [];
 
   array.push(uuidToUint8Array(params.fill_asset_id));
   array.push(encodeRoutes(params.routes));
   array.push(uint64ToUint8Array(formatToInt64(params.minimum)));
 
-  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, mmisg, ...array)));
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, ...array)));
 }
 
 export function decodeSwapMemo(str: string) {
@@ -121,12 +105,9 @@ export function decodeSwapMemo(str: string) {
   const header = decodeHeader(arr);
   const headerByteLength = getHeaderByteLength(header);
 
-  const mmisg = decodeMMISG(arr.slice(headerByteLength));
-  const mmisgByteLength = getMMISGByteLength(mmisg);
-
   const params: Partial<SwapParams> = {};
 
-  let offset = headerByteLength + mmisgByteLength;
+  let offset = headerByteLength;
 
   params.fill_asset_id = uint8ArrayToUUID(arr.slice(offset, offset + 16));
   offset += 16;
@@ -143,7 +124,6 @@ export function decodeSwapMemo(str: string) {
 
   return {
     header,
-    mmisg,
     params,
   };
 }
@@ -155,9 +135,7 @@ export interface AddLiquidityParams {
   follow_id: string;
 }
 
-export function encodeAddLiquidityMemo(
-  params: AddLiquidityParams & MMISGParams
-) {
+export function encodeAddLiquidityMemo(params: AddLiquidityParams) {
   const header = encodeHeader({
     version: HeaderVersion,
     protocol_id: SwapProtocolId,
@@ -166,20 +144,13 @@ export function encodeAddLiquidityMemo(
     action: SwapActionIds.AddLiquidity,
   });
 
-  const mmisg = encodeMMISG({
-    version: MMISGVersion,
-    member_count: params.members.length,
-    threshold: params.threshold,
-    members: params.members,
-  });
-
   const array: Uint8Array[] = [];
 
   array.push(uuidToUint8Array(params.asset_id));
   array.push(uint64ToUint8Array(formatToInt64(params.slippage)));
   array.push(uint16ToUint8Array(params.timeout));
 
-  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, mmisg, ...array)));
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, ...array)));
 }
 
 export function decodeAddLiquidityMemo(str: string) {
@@ -188,12 +159,9 @@ export function decodeAddLiquidityMemo(str: string) {
   const header = decodeHeader(arr);
   const headerByteLength = getHeaderByteLength(header);
 
-  const mmisg = decodeMMISG(arr.slice(headerByteLength));
-  const mmisgByteLength = getMMISGByteLength(mmisg);
-
   const params: Partial<AddLiquidityParams> = {};
 
-  let offset = headerByteLength + mmisgByteLength;
+  let offset = headerByteLength;
 
   params.asset_id = uint8ArrayToUUID(arr.slice(offset, offset + 16));
   offset += 16;
@@ -207,7 +175,6 @@ export function decodeAddLiquidityMemo(str: string) {
 
   return {
     header,
-    mmisg,
     params,
   };
 }
@@ -216,9 +183,7 @@ export interface RemoveLiquidityParams {
   follow_id: string;
 }
 
-export function encodeRemoveLiquidityMemo(
-  params: MMISGParams & RemoveLiquidityParams
-) {
+export function encodeRemoveLiquidityMemo(params: RemoveLiquidityParams) {
   const header = encodeHeader({
     version: HeaderVersion,
     protocol_id: SwapProtocolId,
@@ -227,26 +192,15 @@ export function encodeRemoveLiquidityMemo(
     action: SwapActionIds.RemoveLiquidity,
   });
 
-  const mmisg = encodeMMISG({
-    version: MMISGVersion,
-    member_count: params.members.length,
-    threshold: params.threshold,
-    members: params.members,
-  });
-
-  return uint8ArrayToBase64(checkSum(mergeUint8Array(header, mmisg)));
+  return uint8ArrayToBase64(checkSum(mergeUint8Array(header)));
 }
 
 export function decodeRemoveLiquidityMemo(str: string) {
   const arr = base64ToUint8Array(str);
 
   const header = decodeHeader(arr);
-  const headerByteLength = getHeaderByteLength(header);
-
-  const mmisg = decodeMMISG(arr.slice(headerByteLength));
 
   return {
     header,
-    mmisg,
   };
 }
