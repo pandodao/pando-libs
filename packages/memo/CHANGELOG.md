@@ -1,5 +1,11 @@
 # @pando/memo-encode
 
+## 0.3.2
+
+### Patch Changes
+
+- ad69ba5: add leaf memo
+
 ## 0.3.1
 
 ### Patch Changes
