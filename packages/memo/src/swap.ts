@@ -43,7 +43,6 @@ export function encodeRoutes(routes: RouteItem[]) {
       arrays.push(uint16ToUint8Array(id));
     });
   });
-  console.log("merged array", mergeUint8Array(...arrays));
 
   return mergeUint8Array(...arrays);
 }
@@ -52,7 +51,6 @@ export function decodeRoutes(array: Uint8Array): {
   routes: RouteItem[];
   length: number;
 } {
-  console.log("array", array);
   let offset = 0;
 
   const routes: RouteItem[] = [];

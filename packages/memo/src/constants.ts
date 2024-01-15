@@ -34,3 +34,12 @@ export const LendActionIds = {
   Repay: 4,
   Cancel: 5,
 };
+
+export const LeafActionIds = {
+  OpenVault: 31,
+  Generate: 35,
+  Deposit: 32,
+  Payback: 34,
+  Withdraw: 33,
+  Bid: 42,
+};
