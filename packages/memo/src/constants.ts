@@ -6,6 +6,7 @@ export const LeafProtocolId = 2;
 export const RingsProtocolId = 3;
 export const EarnNodeProtocolId = 4;
 export const LimitOrderProtocolId = 5;
+export const BWatchProtocolId = 6;
 export const LendProtocolId = 6;
 
 export const SwapActionIds = {
@@ -42,4 +43,9 @@ export const LeafActionIds = {
   Payback: 34,
   Withdraw: 33,
   Bid: 42,
+};
+
+export const BWatchActionIds = {
+  buy: 1,
+  redeem: 2,
 };
