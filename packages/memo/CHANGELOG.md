@@ -1,5 +1,11 @@
 # @pando/memo-encode
 
+## 0.3.3
+
+### Patch Changes
+
+- bbd60d1: add bwatch
+
 ## 0.3.2
 
 ### Patch Changes
